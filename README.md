@@ -6,7 +6,7 @@
 
 [Curriculum Learning](https://ronan.collobert.com/pub/matos/2009_curriculum_icml.pdf)
 
-## Link to BSDS500 and gPB source code
+## Links to BSDS500 and gPB source code
 [BSDS500 dataset](http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/BSR/BSR_bsds500.tgz)
 
 [gPB source code](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/resources.html#algorithms)
