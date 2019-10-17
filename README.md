@@ -13,3 +13,13 @@
 
 ## Link to imagenet pretrained VGG16 pytorch model
 [vgg16.pth](https://drive.google.com/open?id=1Nc8HSI1GQ-jzcvbFMqnfKRKMgyOM6xaN) - Download this file and put it under BDCN/caffemodel2pytorch
+
+## How to Run BDCN
+- Run command to create data folder:
+  ```
+  mkdir data && cd data
+  ```
+- Then download and unzip BSDS500 dataset in that folder.
+- Run ```BDCN/generate_dataset_list.py``` to generate filename list.
+- Modify the BSDS500 path in ```BDCN/cfg.py```
+- Run ```BDCN/train.py```
