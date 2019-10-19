@@ -1,5 +1,4 @@
 .idea/
 data/
-datasets/
 vgg16.pth
 BDCN/params/
