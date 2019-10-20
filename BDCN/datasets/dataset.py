@@ -42,7 +42,6 @@ class Data(data.Dataset):
 
 	def __getitem__(self, index):
 		data_file = self.files[index]
-		print("data file: " ,data_file)
 		# load Image
 		img_file = self.root + data_file[0]
 		# print(img_file)

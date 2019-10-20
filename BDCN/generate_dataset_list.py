@@ -11,4 +11,4 @@ for part in dataset_part:
             name = os.path.splitext(file)[0]
             if name != "Thumbs":
                 f.write(os.path.join(sample['x'],part)+"/"+name+file_extension['x']+" "+\
-                        os.path.join(sample['y'],part)+"/"+name+file_extension['y']+"\n")
+                        os.path.join(sample['y'],part)+"/"+name+file_extension['x']+"\n")

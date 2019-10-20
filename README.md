@@ -20,6 +20,7 @@
   mkdir data && cd data
   ```
 - Then download and unzip BSDS500 dataset in that folder.
+- Run ```BDCN/mat2jpg.py``` to convert ground-truth mat data to jpg.
 - Run ```BDCN/generate_dataset_list.py``` to generate filename list.
 - Modify the BSDS500 path in ```BDCN/cfg.py```
 - Run ```BDCN/train.py```
