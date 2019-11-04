@@ -3,3 +3,4 @@ data/
 vgg16.pth
 BDCN/params/
 BDCN/log.txt
+BDCN/results/fuse/

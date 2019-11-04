@@ -1,4 +1,5 @@
 import os
+# dataset_part = ['test']
 dataset_part = ['test','train']
 sample = {'x':'images','y':'gPBgroundTruth'}
 file_extension = {'x':'.jpg','y':'.mat'}
@@ -12,3 +13,4 @@ for part in dataset_part:
             if name != "Thumbs":
                 f.write(os.path.join(sample['x'],part)+"/"+name+file_extension['x']+" "+\
                         os.path.join(sample['y'],part)+"/"+name+file_extension['x']+"\n")
+                # f.write(os.path.join(sample['x'],part)+"/"+name+file_extension['x']+"\n")

@@ -13,6 +13,9 @@ import bdcn
 from datasets.dataset import Data
 import argparse
 import cfg
+import scipy.misc
+import matplotlib.image as mpimg
+from PIL import Image
 from matplotlib import pyplot as plt
 
 def sigmoid(x):
@@ -22,7 +25,7 @@ def sigmoid(x):
 def test(model, args):
     test_root = cfg.config_test[args.dataset]['data_root']
     test_lst = cfg.config_test[args.dataset]['data_lst']
-    test_name_lst = os.path.join(test_root, 'test_pair2.lst')   #'voc_valtest.txt'
+    test_name_lst = os.path.join(test_root, 'test_pair.lst')   #'voc_valtest.txt'
     # test_name_lst = os.path.join(test_root, 'test_id.txt')
     if 'Multicue' in args.dataset:
         test_lst = test_lst % args.k
@@ -45,7 +48,9 @@ def test(model, args):
     iter_per_epoch = len(testloader)
     start_time = time.time()
     all_t = 0
+
     for i, (data, _) in enumerate(testloader):
+        print("index: ", i)
         if args.cuda:
             data = data.cuda()
         data = Variable(data)     #, volatile=True
@@ -54,11 +59,13 @@ def test(model, args):
         fuse = torch.sigmoid(out[-1]).cpu().data.numpy()[0, 0, :, :]
         if not os.path.exists(os.path.join(save_dir, 'fuse')):
             os.mkdir(os.path.join(save_dir, 'fuse'))
-        #cv2.imwrite(os.path.join(save_dir, 'fuse', '%s.png'%nm[i]), 255-fuse*255)
         try:
-            #print(save_dir+'/'+'fuse'+'/'+'%s.png'%nm[i])
-            cv2.imwrite(os.path.join(save_dir, 'fuse', '%s.png'%nm[i]), 255-fuse*255)
+            pic = Image.fromarray(fuse*255)
+            pic = pic.convert('L')
+            pic.save(os.path.join(save_dir, 'fuse', '%s.png'%nm[i][0][:-4]),"PNG")
+            # cv2.imwrite(os.path.join(save_dir, 'fuse', '%s.png'%nm[i][0]), 255-fuse*255)
         except Exception as e:
+            print(e)
             print("not write",i)
         
         all_t += time.time() - tm
@@ -83,8 +90,8 @@ def parse_args():
         help='whether use gpu to train network')
     parser.add_argument('-g', '--gpu', type=str, default='0',
         help='the gpu id to train net')
-    # parser.add_argument('-m', '--model', type=str, default='params_web_wl_add_1/bdcn_20000.pth',
-    parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
+    parser.add_argument('-m', '--model', type=str, default='params/bdcn_10000.pth',
+    # parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
         help='the model to test')
     parser.add_argument('--res-dir', type=str, default='results',
         help='the dir to store result')
