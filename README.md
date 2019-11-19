@@ -28,6 +28,7 @@
 - Run ```BDCN/train.py```
 ## Results
 [Results of BDCN with gPB](https://drive.google.com/open?id=11xS31wRNt9fm89NwMF1x4IKAWv8KVFvl)
+
 [Image Loss After Training - for curriculum learning](https://drive.google.com/open?id=1a8GOQf6F71cIqe_V05m1M0-kKPI9lOZ8)
 
 ![Example Image 1000 iteration](BDCN/results/test_example/bdcn_1000.png)
