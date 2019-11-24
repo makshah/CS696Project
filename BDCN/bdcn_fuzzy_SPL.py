@@ -115,6 +115,7 @@ class BDCN_Fuzzy_SPL(nn.Module):
 
         # Fuzzy_SPL
         self.fuzzy_spl_weight = nn.Embedding(image_size,1)
+        self.fuzzy_spl_sigmoid = nn.Sigmoid()
     def forward(self, x,index):
 
         features = self.features(x)
@@ -180,7 +181,8 @@ class BDCN_Fuzzy_SPL(nn.Module):
 
         fuse = self.fuse(torch.cat([p1_1, p2_1, p3_1, p4_1, p5_1, p1_2, p2_2, p3_2, p4_2, p5_2], 1))
         spl_weight = self.fuzzy_spl_weight(index)
-        return [p1_1, p2_1, p3_1, p4_1, p5_1, p1_2, p2_2, p3_2, p4_2, p5_2, fuse, spl_weight]
+        spl_sigmoid = self.fuzzy_spl_sigmoid(spl_weight)
+        return [p1_1, p2_1, p3_1, p4_1, p5_1, p1_2, p2_2, p3_2, p4_2, p5_2, fuse, spl_sigmoid]
 
     def _initialize_weights(self, logger=None):
         for name, param in self.state_dict().items():

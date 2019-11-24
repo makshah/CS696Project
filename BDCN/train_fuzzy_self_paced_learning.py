@@ -170,7 +170,7 @@ def train(model, args):
                 loss += args.fuse_weight*cross_entropy_loss2d(out[-2], labels, args.cuda, args.balance)/batch_size\
                         +args.reDice_weight*re_Dice_Loss(out[-2], labels, args.cuda, args.balance)/batch_size
 
-                loss_spl = loss*out[-1] - out[-1]*(150+150*(1+math.exp(-0.0002*step)))
+                loss_spl = loss*out[-1] - out[-1]*(500+500*(1+math.exp(-0.0002*step)))
                 file.write("%s,%s,%s,%s\n"%(float(data_index),float(loss),float(out[-1]),float(loss_spl)))
                 loss_spl.backward()
                 batch_loss +=loss_spl.item()       #loss.data[0]  #not suitable for pytorch0.5
