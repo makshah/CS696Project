@@ -11,9 +11,12 @@ import re
 import os
 import sys
 import bdcn
+import bdcn_fuzzy_SPL
 from datasets.dataset import Data
+from datasets.dataset_fuzzy_self_paced_learning import Data_Fuzzy_SPL
 import cfg
 import log
+import math
 import cv2
 
 def adjust_learning_rate(optimizer, steps, step_size, gamma=0.1, logger=None):
@@ -70,7 +73,8 @@ def train(model, args):
     mean_bgr = np.array(cfg.config[args.dataset]['mean_bgr'])
     yita = args.yita if args.yita else cfg.config[args.dataset]['yita']
     crop_size = args.crop_size
-    train_img = Data(data_root, data_lst, yita, mean_bgr=mean_bgr, crop_size=crop_size)
+    # train_img = Data(data_root, data_lst, yita, mean_bgr=mean_bgr, crop_size=crop_size)
+    train_img = Data_Fuzzy_SPL(data_root, data_lst, yita, mean_bgr=mean_bgr, crop_size=crop_size)
     trainloader = torch.utils.data.DataLoader(train_img,
         batch_size=args.batch_size, shuffle=True, num_workers=0)  #num_workers=5
 
@@ -140,51 +144,59 @@ def train(model, args):
         model.load_state_dict(state['param'])
     model.train()
     batch_size = args.iter_size * args.batch_size
-    for step in range(start_step, args.max_iter + 1):
-        optimizer.zero_grad()
-        batch_loss = 0
-        # debug
-        print("step:\t", step)
-        for i in range(args.iter_size):
-            if cur == iter_per_epoch:
-                cur = 0
-                data_iter = iter(trainloader)
-            images, labels = next(data_iter)
-            if args.cuda:
-                images, labels = images.cuda(), labels.cuda()
-            images, labels = Variable(images), Variable(labels)
-            out = model(images)
-            loss = 0
-            
-            side_weight=np.arange(args.side_weight,1,(1-args.side_weight)/10)
-            for k in range(10):
-                loss += side_weight[i]*cross_entropy_loss2d(out[k], labels, args.cuda, args.balance)/batch_size
-            loss += args.fuse_weight*cross_entropy_loss2d(out[-1], labels, args.cuda, args.balance)/batch_size\
-                    +args.reDice_weight*re_Dice_Loss(out[-1], labels, args.cuda, args.balance)/batch_size
-                    
-            loss.backward()
-            batch_loss +=loss.item()       #loss.data[0]  #not suitable for pytorch0.5
-            cur += 1
-        # update parameter
+    with open("./results/spl.csv","w") as file:
 
-        """"---------------------------------commented for curriculum learning--------------------------------------"""
-        # optimizer.step()
-        if len(mean_loss) < args.average_loss:
-            mean_loss.append(batch_loss)
-        else:
-            mean_loss[pos] = batch_loss
-            pos = (pos + 1) % args.average_loss
-        if step % args.step_size == 0:
-            adjust_learning_rate(optimizer, step, args.step_size, args.gamma)
-        if step % args.snapshots == 0:
-            torch.save(model.state_dict(), '%s/bdcn_%d.pth' % (args.param_dir, step))
-            state = {'step': step+1,'param':model.state_dict(),'solver':optimizer.state_dict()}
-            torch.save(state, '%s/bdcn_%d.pth.tar' % (args.param_dir, step))
-        if step % args.display == 0:
-            tm = time.time() - start_time
-            logger.info('iter: %d, lr: %e, loss: %f, time using: %f(%fs/iter)' % (step,
-                optimizer.param_groups[0]['lr'], np.mean(mean_loss), tm, tm/args.display))
-            start_time = time.time()
+        for step in range(start_step, args.max_iter + 1):
+            optimizer.zero_grad()
+            batch_loss = 0
+            # debug
+            print("step:\t", step)
+            for i in range(args.iter_size):
+                if cur == iter_per_epoch:
+                    cur = 0
+                    data_iter = iter(trainloader)
+                images, labels, data_index = next(data_iter)
+                if args.cuda:
+                    images, labels = images.cuda(), labels.cuda()
+                    data_index = data_index.cuda()
+                images, labels = Variable(images), Variable(labels)
+                data_index = Variable(data_index)
+                out = model(images,data_index)
+                loss = 0
+
+                side_weight=np.arange(args.side_weight,1,(1-args.side_weight)/10)
+                for k in range(10):
+                    loss += side_weight[i]*cross_entropy_loss2d(out[k], labels, args.cuda, args.balance)/batch_size
+                loss += args.fuse_weight*cross_entropy_loss2d(out[-2], labels, args.cuda, args.balance)/batch_size\
+                        +args.reDice_weight*re_Dice_Loss(out[-2], labels, args.cuda, args.balance)/batch_size
+
+                loss_spl = loss*out[-1] - out[-1]*(150+150*(1+math.exp(-0.0002*step)))
+                file.write("%s,%s,%s,%s\n"%(float(data_index),float(loss),float(out[-1]),float(loss_spl)))
+                loss_spl.backward()
+                batch_loss +=loss_spl.item()       #loss.data[0]  #not suitable for pytorch0.5
+                # loss.backward()
+                # batch_loss += loss.item()  # loss.data[0]  #not suitable for pytorch0.5
+                cur += 1
+            # update parameter
+
+            """"---------------------------------commented for curriculum learning--------------------------------------"""
+            # optimizer.step()
+            if len(mean_loss) < args.average_loss:
+                mean_loss.append(batch_loss)
+            else:
+                mean_loss[pos] = batch_loss
+                pos = (pos + 1) % args.average_loss
+            if step % args.step_size == 0:
+                adjust_learning_rate(optimizer, step, args.step_size, args.gamma)
+            if step % args.snapshots == 0:
+                torch.save(model.state_dict(), '%s/bdcn_%d.pth' % (args.param_dir, step))
+                state = {'step': step+1,'param':model.state_dict(),'solver':optimizer.state_dict()}
+                torch.save(state, '%s/bdcn_%d.pth.tar' % (args.param_dir, step))
+            if step % args.display == 0:
+                tm = time.time() - start_time
+                logger.info('iter: %d, lr: %e, loss: %f, time using: %f(%fs/iter)' % (step,
+                    optimizer.param_groups[0]['lr'], np.mean(mean_loss), tm, tm/args.display))
+                start_time = time.time()
 
 def main():
     args = parse_args()
@@ -201,7 +213,7 @@ def main():
     if not os.path.exists(args.param_dir):
         os.mkdir(args.param_dir)
     torch.manual_seed(int(time.time()))
-    model = bdcn.BDCN(pretrain=args.pretrain, logger=logger)
+    model = bdcn_fuzzy_SPL.BDCN_Fuzzy_SPL(pretrain=args.pretrain, logger=logger)
     if args.complete_pretrain:
         model.load_state_dict(torch.load(args.complete_pretrain))
     logger.info(model)

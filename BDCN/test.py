@@ -23,9 +23,11 @@ def sigmoid(x):
 
 
 def test(model, args):
-    test_root = cfg.config_test[args.dataset]['data_root']
-    test_lst = cfg.config_test[args.dataset]['data_lst']
-    test_name_lst = os.path.join(test_root, 'test_pair.lst')   #'voc_valtest.txt'
+    # test_root = cfg.config_test[args.dataset]['data_root']
+    test_root = cfg.config[args.dataset]['data_root']
+    # test_lst = cfg.config_test[args.dataset]['data_lst']
+    test_lst = cfg.config[args.dataset]['data_lst']
+    test_name_lst = os.path.join(test_root, 'train_pair.lst')   #'voc_valtest.txt'
     # test_name_lst = os.path.join(test_root, 'test_id.txt')
     if 'Multicue' in args.dataset:
         test_lst = test_lst % args.k
@@ -90,7 +92,7 @@ def parse_args():
         help='whether use gpu to train network')
     parser.add_argument('-g', '--gpu', type=str, default='0',
         help='the gpu id to train net')
-    parser.add_argument('-m', '--model', type=str, default='params/bdcn_10000.pth',
+    parser.add_argument('-m', '--model', type=str, default='params/bdcn_40000.pth',
     # parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
         help='the model to test')
     parser.add_argument('--res-dir', type=str, default='results',
