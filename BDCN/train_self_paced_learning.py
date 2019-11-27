@@ -169,7 +169,11 @@ def train(model, args):
                 loss += args.fuse_weight*cross_entropy_loss2d(out[-1], labels, args.cuda, args.balance)/batch_size\
                         +args.reDice_weight*re_Dice_Loss(out[-1], labels, args.cuda, args.balance)/batch_size
 
-                loss_spl = loss if loss < (400+500*(1+math.exp(-0.0002*step))) else torch.tensor(0)
+                if loss < (400+500*(1+math.exp(-0.0002*step))):
+                    loss_spl = loss
+                else:
+                    loss_spl = Variable(torch.tensor(0),requires_grad=True)
+                # loss_spl = loss if loss < (400+500*(1+math.exp(-0.0002*step)))
                 # loss_spl = loss*out[-1] - out[-1]*(500+500*(1+math.exp(-0.0002*step)))
                 file.write("%s,%s,%s\n"%(float(data_index),float(loss),float(loss_spl)))
                 loss_spl.backward()
