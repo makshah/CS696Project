@@ -172,7 +172,7 @@ def train(model, args):
                 if loss < (400+500*(1+math.exp(-0.0002*step))):
                     loss_spl = loss
                 else:
-                    loss_spl = Variable(torch.tensor(0),requires_grad=True)
+                    loss_spl = Variable(torch.tensor(0.0),requires_grad=True)
                 # loss_spl = loss if loss < (400+500*(1+math.exp(-0.0002*step)))
                 # loss_spl = loss*out[-1] - out[-1]*(500+500*(1+math.exp(-0.0002*step)))
                 file.write("%s,%s,%s\n"%(float(data_index),float(loss),float(loss_spl)))
