@@ -180,7 +180,7 @@ def train(model, args):
             # update parameter
 
             """"---------------------------------commented for curriculum learning--------------------------------------"""
-            # optimizer.step()
+            optimizer.step()
             if len(mean_loss) < args.average_loss:
                 mean_loss.append(batch_loss)
             else:

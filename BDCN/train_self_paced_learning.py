@@ -144,6 +144,9 @@ def train(model, args):
         model.load_state_dict(state['param'])
     model.train()
     batch_size = args.iter_size * args.batch_size
+
+    print("data_size: ",len(train_img))
+    Vi = [1]*len(train_img)
     with open("spl.csv","w") as file:
         for step in range(start_step, args.max_iter + 1):
             optimizer.zero_grad()
@@ -169,12 +172,19 @@ def train(model, args):
                 loss += args.fuse_weight*cross_entropy_loss2d(out[-1], labels, args.cuda, args.balance)/batch_size\
                         +args.reDice_weight*re_Dice_Loss(out[-1], labels, args.cuda, args.balance)/batch_size
 
-                if loss < (400+500*(1+math.exp(-0.0002*step))):
-                    loss_spl = loss
-                else:
-                    loss_spl = Variable(torch.tensor(0.0),requires_grad=True)
+                # if loss < (2000+0.05*step):
+                #     loss_spl = loss
+                # else:
+                #     loss_spl = Variable(torch.tensor(0.0),requires_grad=True)
                 # loss_spl = loss if loss < (400+500*(1+math.exp(-0.0002*step)))
                 # loss_spl = loss*out[-1] - out[-1]*(500+500*(1+math.exp(-0.0002*step)))
+                K = 2000 + 0.05 * step
+                loss_spl = loss*Vi[data_index]-K*Vi[data_index]
+                if loss < K:
+                    Vi[data_index] = 1
+                else:
+                    Vi[data_index] = 0
+
                 file.write("%s,%s,%s\n"%(float(data_index),float(loss),float(loss_spl)))
                 loss_spl.backward()
                 batch_loss +=loss_spl.item()       #loss.data[0]  #not suitable for pytorch0.5
@@ -184,7 +194,8 @@ def train(model, args):
             # update parameter
 
             """"---------------------------------commented for curriculum learning--------------------------------------"""
-            # optimizer.step()
+
+            optimizer.step()
             if len(mean_loss) < args.average_loss:
                 mean_loss.append(batch_loss)
             else:

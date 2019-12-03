@@ -22,12 +22,12 @@ def sigmoid(x):
 
 
 def test(model, args):
-    # test_root = cfg.config_test[args.dataset]['data_root']
-    test_root = cfg.config[args.dataset]['data_root']
-    # test_lst = cfg.config_test[args.dataset]['data_lst']
-    test_lst = cfg.config[args.dataset]['data_lst']
-    test_name_lst = os.path.join(test_root, 'train_pair.lst')   #'voc_valtest.txt'
-    # test_name_lst = os.path.join(test_root, 'test_id.txt')
+    test_root = cfg.config_test[args.dataset]['data_root']
+    # test_root = cfg.config[args.dataset]['data_root']
+    test_lst = cfg.config_test[args.dataset]['data_lst']
+    # test_lst = cfg.config[args.dataset]['data_lst']
+    # test_name_lst = os.path.join(test_root, 'train_pair.lst')   #'voc_valtest.txt'
+    test_name_lst = os.path.join(test_root, 'test.lst')
     if 'Multicue' in args.dataset:
         test_lst = test_lst % args.k
         test_name_lst = os.path.join(test_root, 'test%d_id.txt'%args.k)
@@ -49,7 +49,8 @@ def test(model, args):
     iter_per_epoch = len(testloader)
     start_time = time.time()
     all_t = 0
-
+    # print("data_iter: ", data_iter.__next__())
+    print(testloader)
     for i, (data, _) in enumerate(testloader):
         print("index: ", i)
         if args.cuda:
@@ -61,8 +62,10 @@ def test(model, args):
         if not os.path.exists(os.path.join(save_dir, 'fuse')):
             os.mkdir(os.path.join(save_dir, 'fuse'))
         try:
+            # print(fuse)
             pic = Image.fromarray(fuse*255)
             pic = pic.convert('L')
+            # print(pic)
             pic.save(os.path.join(save_dir, 'fuse', '%s.png'%nm[i][0][:-4]),"PNG")
             # cv2.imwrite(os.path.join(save_dir, 'fuse', '%s.png'%nm[i][0]), 255-fuse*255)
         except Exception as e:
@@ -91,7 +94,7 @@ def parse_args():
         help='whether use gpu to train network')
     parser.add_argument('-g', '--gpu', type=str, default='0',
         help='the gpu id to train net')
-    parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
+    parser.add_argument('-m', '--model', type=str, default='params/bdcn_4000.pth',
     # parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
         help='the model to test')
     parser.add_argument('--res-dir', type=str, default='results',

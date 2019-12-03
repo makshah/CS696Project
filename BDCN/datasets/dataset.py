@@ -32,6 +32,7 @@ class Data(data.Dataset):
 		self.cache = {}
 
 		lst_dir = os.path.join(self.root, self.lst)
+		print(lst_dir)
 		# self.files = np.loadtxt(lst_dir, dtype=str)
 		with open(lst_dir, 'r') as f:
 			self.files = f.readlines()
