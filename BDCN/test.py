@@ -8,13 +8,12 @@ import time
 import re
 import os
 import sys
-import cv2
 import bdcn
 from datasets.dataset import Data
 import argparse
 import cfg
-import scipy.misc
 import matplotlib.image as mpimg
+import cv2
 from PIL import Image
 from matplotlib import pyplot as plt
 
@@ -92,7 +91,7 @@ def parse_args():
         help='whether use gpu to train network')
     parser.add_argument('-g', '--gpu', type=str, default='0',
         help='the gpu id to train net')
-    parser.add_argument('-m', '--model', type=str, default='params/bdcn_40000.pth',
+    parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
     # parser.add_argument('-m', '--model', type=str, default='params/bdcn_1000.pth',
         help='the model to test')
     parser.add_argument('--res-dir', type=str, default='results',
