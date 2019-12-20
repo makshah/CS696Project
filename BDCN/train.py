@@ -253,7 +253,7 @@ def parse_args():
         help='the param to operate gt, default is data in the config file')
     parser.add_argument('--complete-pretrain', type=str, default=None,
         help='finetune on the complete_pretrain, default None')
-    parser.add_argument('--side-weight', type=float, default=0.2,
+    parser.add_argument('--side-weight', type=float, default=0.5,
         help='the loss weight of sideout, default 0.5')
     parser.add_argument('--fuse-weight', type=float, default=1.1,
         help='the loss weight of fuse, default 1.1')

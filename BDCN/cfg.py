@@ -5,7 +5,7 @@ config = {
                 'yita': 0.5},
                 
     'bsds500': {'data_root': '../data/HED-BSDS/',
-                'data_lst': 'train_pair.lst',
+                'data_lst': 'train_pair_1500.lst',
                 'mean_bgr': [104.00699, 116.66877, 122.67892],
                 'yita': 0.5},
     'pascal_context': {'data_root': 'path_to/bsds500/PASCAL/',

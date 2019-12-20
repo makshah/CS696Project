@@ -172,12 +172,6 @@ def train(model, args):
                 loss += args.fuse_weight*cross_entropy_loss2d(out[-1], labels, args.cuda, args.balance)/batch_size\
                         +args.reDice_weight*re_Dice_Loss(out[-1], labels, args.cuda, args.balance)/batch_size
 
-                # if loss < (2000+0.05*step):
-                #     loss_spl = loss
-                # else:
-                #     loss_spl = Variable(torch.tensor(0.0),requires_grad=True)
-                # loss_spl = loss if loss < (400+500*(1+math.exp(-0.0002*step)))
-                # loss_spl = loss*out[-1] - out[-1]*(500+500*(1+math.exp(-0.0002*step)))
                 K = 2000 + 0.05 * step
                 loss_spl = loss*Vi[data_index]-K*Vi[data_index]
                 if loss < K:
